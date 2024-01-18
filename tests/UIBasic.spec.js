@@ -82,7 +82,7 @@ test('Browser Playwright test', async ({browser}) => {
     console.log(allTitles)
  })
 
- test.only('Browser Playwright Test Let\'s Shop', async ({browser}) => 
+ test('Browser Playwright Test Let\'s Shop', async ({browser}) => 
  {
     const context = await browser.newContext()
     const page =  await context.newPage()
@@ -103,3 +103,17 @@ test('Browser Playwright test', async ({browser}) => {
     const allTitles = await cardTitles.allTextContents()
     console.log(allTitles)
  })
+
+test.only('Browser Playwright Test Let\'s Shop Lecturer example', async ({page}) => {
+   await page.goto("https://rahulshettyacademy.com/client")
+   await page.locator("#userEmail").fill("lasse@gmail.com")
+   await page.locator("#userPassword").fill("Salasana@1")
+   await page.locator("[value='Login']").click()
+   //  await page.locator("//input[@id='login']").click()
+   console.log(await page.title())
+   console.log("--------------------<>---------------------")
+   // await page.waitForLoadState('networkidle') might be Flacky -> latter is BETTER
+   await page.locator(".card-body b").first().waitFor() 
+   const allTitles = await page.locator(".card-body b").allTextContents()
+   console.log(allTitles)
+})
