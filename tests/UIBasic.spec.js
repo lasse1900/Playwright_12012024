@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { text } = require('stream/consumers');
 
 test('Page Playwright test', async ({page}) => {
   await page.goto("https://google.com")
@@ -104,7 +105,7 @@ test('Browser Playwright test', async ({browser}) => {
     console.log(allTitles)
  })
 
-test.only('Browser Playwright Test Let\'s Shop Lecturer example', async ({page}) => {
+test('Browser Playwright Test Let\'s Shop Lecturer example', async ({page}) => {
    await page.goto("https://rahulshettyacademy.com/client")
    await page.locator("#userEmail").fill("lasse@gmail.com")
    await page.locator("#userPassword").fill("Salasana@1")
@@ -117,3 +118,83 @@ test.only('Browser Playwright Test Let\'s Shop Lecturer example', async ({page})
    const allTitles = await page.locator(".card-body b").allTextContents()
    console.log(allTitles)
 })
+
+// Dropdowns
+
+test('UI Controls', async ({browser}) => 
+{
+   const context = await browser.newContext()
+   const page =  await context.newPage()
+   await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+   const documentLink = page.locator("[href*='documents-request']")
+   await page.locator(".radiotextsty").last().click()
+   await page.locator("#okayBtn").click() // by ID
+   console.log(await page.locator(".radiotextsty").last().isChecked())   
+   await expect(page.locator(".radiotextsty").last()).toBeChecked()
+   // await page.locator("//input[@id='terms']").click()
+   await page.locator("#terms").click()
+   await expect(page.locator("//input[@id='terms']")).toBeChecked()
+   await page.locator("#terms").uncheck()
+   expect(await page.locator("#terms").isChecked()).toBeFalsy()
+   await expect(documentLink).toHaveAttribute('class', 'blinkingText');
+   // assertion
+   // await page.pause()
+})
+
+
+test('Windows handle all', async ({browser}) => 
+{
+   const context = await browser.newContext()
+   const page =  await context.newPage()
+   await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+   const userName = page.locator("#username")
+   const signIn = page.locator("#signInBtn")
+   const documentLink = page.locator("[href*='documents-request']")
+   await userName.type("rahulshettyacademy")
+   await page.locator("[type='password']").fill("learning")
+   await page.locator(".radiotextsty").last().click()
+   await page.locator("#okayBtn").click() // by ID
+   console.log(await page.locator(".radiotextsty").last().isChecked())   
+   await expect(page.locator(".radiotextsty").last()).toBeChecked()
+   // await page.locator("//input[@id='terms']").click()
+   await page.locator("#terms").click()
+   await expect(page.locator("//input[@id='terms']")).toBeChecked()
+   await page.locator("#terms").uncheck()
+   expect(await page.locator("#terms").isChecked()).toBeFalsy()
+   await expect(documentLink).toHaveAttribute('class', 'blinkingText');
+
+   // assertion
+   // await page.pause()
+   const dropdown = page.locator("select.form-control ")
+   await dropdown.selectOption("consult")
+   await signIn.click()
+})
+
+
+test.only('@Child Windows handle', async ({ browser }) => {
+   const context = await browser.newContext();
+   const page = await context.newPage();
+   const page2 = await context.newPage(); // extra
+   const userName = page.locator("#username");
+   await page.goto("https://rahulshettyacademy.com/loginpagePractise/");
+   await page2.goto("https://dance-calendar.herokuapp.com");
+   const documentLink = page.locator("[href*='documents-request']");
+ 
+   const [newPage] = await Promise.all([
+     context.waitForEvent('page'), // listen for any new page pending, rejected, fulfilled
+     documentLink.click(),
+   ]); // new page is opened, you can open more windows
+ 
+   const text = await newPage.locator(".im-para.red").textContent();
+   const arrayText = text?.split("@");
+   // @ts-ignore
+   const domain = arrayText[1].split(" ")[0];
+   console.log(domain);
+   await page.locator("#username").type(domain);
+   console.log(await page.locator("#username").inputValue()); // Use `inputValue` instead of `textContent`
+ 
+   // @ts-ignore
+   const text2 = await page2.locator(".content").textContent(); // Use `page2` instead of `newPage2`
+   console.log(text2);
+ });
+ 
